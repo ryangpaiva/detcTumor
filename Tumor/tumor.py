@@ -1,16 +1,19 @@
 import os
-import pandas as pd
-import random
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import pickle 
 import tensorflow as tf 
 from sklearn.model_selection import train_test_split
 import keras
-
 from google.colab import drive
+
+
+
+
+
+
 drive.mount('/content/drive')
+##Insira aqui o seu caminho, possível utilizar caminho remoto ou local
 
 caminho ='./drive/My Drive/tumores/'
 os.listdir(caminho)
@@ -21,6 +24,8 @@ def ftumores(caminho):
  
   imagem = []
   rotulo = []
+
+  # Nesta seção iremos separar as imagens e normaliza-las
  
   for sub in subpasta:
     arquivos_img = os.listdir(caminho+sub)
@@ -38,6 +43,8 @@ def ftumores(caminho):
   return np.asarray(rotulo), np.asarray(imagem)
 
 rotulo, caracteristicas = ftumores(caminho)
+
+# Nesta seção damos inícios ao processo de treinamento da rede neural
 
 caracteristicas_treino, caracteristicas_teste, rotulo_treino, rotulo_test = train_test_split(caracteristicas, rotulo, test_size = 0.2, random_state = 10)
 
@@ -67,10 +74,14 @@ predictions[0:5]
 rotulo_pred = ["livre de tumor" if x[0] > x[1] else "com tumor" for x in predictions]
 rotulo_pred[0:10]
 
-classifications = model.predict(caracteristicas_teste)
+classifications = model.predict(caracteristicas_teste) # Utilizaremos disto para usar do treinamento prévio para aplicar a novas imagens
 print(classifications[50])
 
-# agora vamos pegar uma imagem real, que já sabemos o resultado e vamos testar se a rede neural reconhece de forma correta
+
+"""
+Esta parte do código é destinada aos testes utilizando do modelo já treinado
+
+Agora vamos pegar uma imagem real, que já sabemos o resultado e vamos testar se a rede neural reconhece de forma correta
 
 from urllib.request import urlretrieve
  
@@ -79,7 +90,7 @@ urlretrieve("https://drive.google.com/u/0/uc?id=1DTZ6X7Tunu0GdnxYD7MUE0NI1b_bVsJ
 tumor = cv2.imread('tumor.jpg',cv2.IMREAD_GRAYSCALE )
 print(tumor)
 
-%matplotlib inline
+
 plt.imshow(tumor)
 plt.show()
 
@@ -87,10 +98,10 @@ tumor = cv2.resize(tumor, (30,20), interpolation = cv2.INTER_AREA)
 len(tumor)
 
 tumor = tf.keras.utils.normalize(tumor, axis=1) 
-tumor
+
 
 tumor= tumor.reshape(-1)
-tumor
+
 
 caracteristicas_teste = np.vstack((caracteristicas_teste, tumor))
 
@@ -123,5 +134,5 @@ nada
 caracteristicas_teste = np.vstack((caracteristicas_teste, nada))
 
 print(classifications[52]) # aqui teremos uma previsão que indica negativo
-
+"""
 
